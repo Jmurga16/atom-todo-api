@@ -20,7 +20,32 @@ export const createRoutes = (
   // Rutas de tareas
   router.use('/tasks', createTaskRoutes(taskController));
 
-  // Ruta de health check
+  /**
+   * @swagger
+   * /api/health:
+   *   get:
+   *     tags: [Health]
+   *     summary: Health check
+   *     description: Check if the API is running and responsive
+   *     responses:
+   *       200:
+   *         description: API is healthy
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 success:
+   *                   type: boolean
+   *                   example: true
+   *                 message:
+   *                   type: string
+   *                   example: API is running
+   *                 timestamp:
+   *                   type: string
+   *                   format: date-time
+   *                   example: 2024-01-15T10:00:00.000Z
+   */
   router.get('/health', (_req, res) => {
     res.status(200).json({
       success: true,

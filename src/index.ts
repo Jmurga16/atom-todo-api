@@ -20,6 +20,9 @@ if (require.main === module) {
     console.log(`🚀 Server running on port ${PORT}`);
     console.log(`📝 Environment: ${config.nodeEnv}`);
     console.log(`🔥 Firebase Project: ${config.firebase.projectId || 'Not configured'}`);
+    console.log(`\n📖 API Documentation:`);
+    console.log(`   Swagger UI: http://localhost:${PORT}/api-docs`);
+    console.log(`   Swagger JSON: http://localhost:${PORT}/api-docs.json`);
     console.log(`\n📚 API Endpoints:`);
     console.log(`   GET  /api/health - Health check`);
     console.log(`   GET  /api/users/:email - Get user by email`);

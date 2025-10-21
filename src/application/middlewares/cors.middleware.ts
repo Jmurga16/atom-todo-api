@@ -7,11 +7,17 @@ import { config } from '../../config/env.config';
  */
 export const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-    // Permitir requests sin origin (como mobile apps o curl requests)
+    // Permitir requests sin origin (como mobile apps, curl, o Swagger UI)
     if (!origin) {
       return callback(null, true);
     }
 
+    // En desarrollo, permitir localhost en cualquier puerto
+    if (config.nodeEnv === 'development' && origin.includes('localhost')) {
+      return callback(null, true);
+    }
+
+    // Verificar lista de orígenes permitidos
     if (config.cors.allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -19,7 +25,7 @@ export const corsOptions: cors.CorsOptions = {
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   maxAge: 86400, // 24 horas
 };

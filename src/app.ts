@@ -1,4 +1,5 @@
 import express, { Application } from 'express';
+import swaggerUi from 'swagger-ui-express';
 import { corsMiddleware } from './application/middlewares/cors.middleware';
 import { errorHandler, notFoundHandler } from './application/middlewares/error.middleware';
 import { createRoutes } from './application/routes';
@@ -9,6 +10,7 @@ import { TaskService } from './domain/use-cases/TaskService';
 import { UserRepository } from './infrastructure/repositories/UserRepository';
 import { TaskRepository } from './infrastructure/repositories/TaskRepository';
 import { validateConfig } from './config/env.config';
+import { swaggerSpec } from './config/swagger.config';
 
 /**
  * Configuración de la aplicación Express
@@ -24,6 +26,18 @@ export const createApp = (): Application => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(corsMiddleware);
+
+  // Swagger UI - Documentación interactiva
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+    customCss: '.swagger-ui .topbar { display: none }',
+    customSiteTitle: 'ATOM Todo API Documentation',
+  }));
+
+  // Swagger JSON
+  app.get('/api-docs.json', (_req, res) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(swaggerSpec);
+  });
 
   // Inyección de dependencias (Dependency Injection Pattern)
   // Repositorios

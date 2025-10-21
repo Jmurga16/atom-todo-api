@@ -53,9 +53,14 @@ export class UserRepository implements IUserRepository {
       }
 
       // Verificar si el usuario ya existe
-      const existingUser = await this.findByEmail(dto.email);
-      if (existingUser) {
-        throw new Error('User already exists');
+      try {
+        const existingUser = await this.findByEmail(dto.email);
+        if (existingUser) {
+          throw new Error('User already exists');
+        }
+      } catch (error) {
+        // Si hay error al buscar el usuario, asumimos que no existe y continuamos
+        console.warn('Warning: Could not verify if user exists, proceeding with creation:', error);
       }
 
       // Crear usuario usando Factory
