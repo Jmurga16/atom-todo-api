@@ -41,8 +41,8 @@ Desarrollado con:
       description: 'Development server',
     },
     {
-      url: 'https://us-central1-atom-todo-app-db51d.cloudfunctions.net',
-      description: 'Production server (Firebase Functions)',
+      url: 'https://api-rpdq2m3giq-uc.a.run.app',
+      description: 'Production server (Cloud Run)',
     },
   ],
   tags: [

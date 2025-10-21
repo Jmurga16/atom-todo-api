@@ -59,9 +59,9 @@ cp .env.example .env
 Abrir `.env` y completar con los datos del JSON descargado:
 
 ```env
-FIREBASE_PROJECT_ID=tu-proyecto-id
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nTU_PRIVATE_KEY_AQUI\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@tu-proyecto.iam.gserviceaccount.com
+FB__PROJECT_ID=tu-proyecto-id
+FB__PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nTU_PRIVATE_KEY_AQUI\n-----END PRIVATE KEY-----\n"
+FB__CLIENT_EMAIL=firebase-adminsdk-xxxxx@tu-proyecto.iam.gserviceaccount.com
 
 PORT=3000
 NODE_ENV=development

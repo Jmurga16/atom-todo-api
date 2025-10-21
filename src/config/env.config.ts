@@ -9,12 +9,13 @@ dotenv.config();
  */
 export const config = {
   nodeEnv: process.env.NODE_ENV || 'development',
-  port: parseInt(process.env.PORT || '3000', 10),
+  // En Firebase Functions/Cloud Run, usar PORT (8080), en desarrollo usar SERVER_PORT (3000)
+  port: parseInt(process.env.PORT || process.env.SERVER_PORT || '8080', 10),
 
   firebase: {
-    projectId: process.env.FIREBASE_PROJECT_ID || '',
-    privateKey: process.env.FIREBASE_PRIVATE_KEY || '',
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL || '',
+    projectId: process.env.FB_PROJECT_ID || '',
+    privateKey: process.env.FB_PRIVATE_KEY || '',
+    clientEmail: process.env.FB_CLIENT_EMAIL || '',
   },
 
   cors: {
@@ -27,8 +28,8 @@ export const config = {
  */
 export function validateConfig(): void {
   const requiredEnvVars = [
-    'FIREBASE_PROJECT_ID',
-    'FIREBASE_CLIENT_EMAIL',
+    'FB_PROJECT_ID',
+    'FB_CLIENT_EMAIL',
   ];
 
   const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);

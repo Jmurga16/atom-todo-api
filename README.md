@@ -145,9 +145,9 @@ Editar el archivo `.env` con tus credenciales de Firebase:
 
 ```env
 # Firebase Configuration
-FIREBASE_PROJECT_ID=tu-proyecto-id
-FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
-FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@tu-proyecto.iam.gserviceaccount.com
+FB__PROJECT_ID=tu-proyecto-id
+FB__PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+FB__CLIENT_EMAIL=firebase-adminsdk-xxxxx@tu-proyecto.iam.gserviceaccount.com
 
 # Server Configuration
 PORT=3000

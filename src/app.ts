@@ -17,26 +17,67 @@ import { swaggerSpec } from './config/swagger.config';
  * Siguiendo el principio de inversión de dependencias (Dependency Injection)
  */
 export const createApp = (): Application => {
-  // Validar configuración
-  validateConfig();
-
   const app = express();
+
+  // Health check endpoint - debe ir PRIMERO
+  app.get('/health', (_req, res) => {
+    res.status(200).json({ 
+      status: 'OK', 
+      timestamp: new Date().toISOString(),
+      env: process.env.NODE_ENV || 'development',
+      port: process.env.PORT || process.env.SERVER_PORT || '8080'
+    });
+  });
+
+  // Validar configuración DESPUÉS del health check
+  try {
+    validateConfig();
+  } catch (error) {
+    console.error(' Configuration validation failed:', error);
+    // No fallar completamente, permitir que el health check funcione
+  }
 
   // Middlewares globales
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+
+  // Middleware especial para rutas de documentación (sin CORS estricto)
+  app.use(['/api-docs', '/api-docs.json'], (_req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next();
+  });
+
   app.use(corsMiddleware);
 
   // Swagger UI - Documentación interactiva
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+  app.use('/api-docs', swaggerUi.serve);
+  app.get('/api-docs', swaggerUi.setup(swaggerSpec, {
     customCss: '.swagger-ui .topbar { display: none }',
     customSiteTitle: 'ATOM Todo API Documentation',
+    explorer: true,
   }));
 
   // Swagger JSON
   app.get('/api-docs.json', (_req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(swaggerSpec);
+  });
+
+  // Ruta de información de la API
+  app.get('/', (_req, res) => {
+    res.json({
+      name: 'ATOM Todo API',
+      version: '1.0.0',
+      description: 'Backend API for ATOM Todo App',
+      endpoints: {
+        swagger: '/api-docs',
+        swaggerJson: '/api-docs.json',
+        health: '/health',
+        api: '/api'
+      }
+    });
   });
 
   // Inyección de dependencias (Dependency Injection Pattern)
