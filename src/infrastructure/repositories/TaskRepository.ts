@@ -11,19 +11,39 @@ export class TaskRepository implements ITaskRepository {
 
   async findByUserId(userId: string): Promise<Task[]> {
     try {
-      const snapshot = await db
-        .collection(this.collection)
-        .where('userId', '==', userId)
-        .orderBy('createdAt', 'desc')
-        .get();
+      console.log('🔍 Finding tasks for user:', userId);
+      
+      // Intentar consulta con orderBy (requiere índice compuesto)
+      let snapshot;
+      try {
+        snapshot = await db
+          .collection(this.collection)
+          .where('userId', '==', userId)
+          .orderBy('createdAt', 'desc')
+          .get();
+      } catch (orderError) {
+        console.warn('⚠️  OrderBy failed, trying without orderBy:', orderError);
+        // Si falla el orderBy (falta de índice), hacer consulta simple
+        snapshot = await db
+          .collection(this.collection)
+          .where('userId', '==', userId)
+          .get();
+      }
 
       if (snapshot.empty) {
+        console.log('📭 No tasks found for user:', userId);
         return [];
       }
 
-      return snapshot.docs.map(doc => this.mapDocumentToTask(doc));
+      const tasks = snapshot.docs.map(doc => this.mapDocumentToTask(doc));
+      
+      // Ordenar manualmente si no se pudo hacer en la consulta
+      tasks.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      
+      console.log('✅ Found', tasks.length, 'tasks for user:', userId);
+      return tasks;
     } catch (error) {
-      console.error('Error finding tasks by user id:', error);
+      console.error('❌ Error finding tasks by user id:', error);
       throw new Error('Failed to find tasks by user id');
     }
   }
@@ -133,17 +153,23 @@ export class TaskRepository implements ITaskRepository {
     const data = doc.data();
 
     if (!data) {
+      console.error('❌ Invalid document data for doc:', doc.id);
       throw new Error('Invalid document data');
     }
 
-    return {
-      id: doc.id,
-      userId: data.userId,
-      title: data.title,
-      description: data.description,
-      completed: data.completed,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
-    };
+    try {
+      return {
+        id: doc.id,
+        userId: data.userId || '',
+        title: data.title || '',
+        description: data.description || '',
+        completed: data.completed || false,
+        createdAt: data.createdAt?.toDate() || new Date(),
+        updatedAt: data.updatedAt?.toDate() || new Date(),
+      };
+    } catch (error) {
+      console.error('❌ Error mapping document to task:', error, 'Data:', data);
+      throw new Error(`Failed to map document ${doc.id} to task`);
+    }
   }
 }
