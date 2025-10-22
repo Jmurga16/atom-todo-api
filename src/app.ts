@@ -21,11 +21,23 @@ export const createApp = (): Application => {
 
   // Health check endpoint - debe ir PRIMERO
   app.get('/health', (_req, res) => {
+    res.set({
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+    
     res.status(200).json({ 
       status: 'OK', 
+      message: 'ATOM Todo API is running',
       timestamp: new Date().toISOString(),
       env: process.env.NODE_ENV || 'development',
-      port: process.env.PORT || process.env.SERVER_PORT || '8080'
+      version: '1.0.0',
+      endpoints: {
+        health: '/health',
+        api: '/api',
+        docs: '/api-docs'
+      }
     });
   });
 
