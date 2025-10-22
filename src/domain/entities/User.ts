@@ -8,6 +8,16 @@ export interface CreateUserDTO {
   email: string;
 }
 
+export interface UserWithToken extends User {
+  token: string;
+}
+
+export interface UserExistsData {
+  exists: boolean;
+  user?: User;
+  token?: string;
+}
+
 export class UserFactory {
   static create(email: string): Omit<User, 'id'> {
     const now = new Date();

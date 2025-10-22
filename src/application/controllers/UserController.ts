@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { UserService } from '../../domain/use-cases/UserService';
 import { JwtService } from '../../domain/use-cases/JwtService';
 import { asyncHandler, AppError } from '../middlewares/error.middleware';
+import { UserWithToken, UserExistsData } from '../../domain/entities/User';
+import { ApiResponse } from '../../domain/entities/ApiResponse';
 
 
 export class UserController {
@@ -21,23 +23,27 @@ export class UserController {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
-      // Usuario no existe, pero NO es un error (200 OK)
-      res.status(200).json({
+      // Usuario no existe
+      const response: ApiResponse<UserExistsData> = {
         success: true,
-        exists: false,
+        data: { exists: false },
         message: 'User not found',
-      });
+      };
+      res.status(200).json(response);
       return;
     }
 
     // Generar JWT token
     const token = this.jwtService.generateToken(user.id, user.email);
 
-    res.status(200).json({
+    const response: ApiResponse<UserExistsData> = {
       success: true,
-      exists: true,
-      token,
-    });
+      data: {
+        exists: true,
+        token,
+      },
+    };
+    res.status(200).json(response);
   });
 
   /** POST /api/users/login
@@ -49,20 +55,24 @@ export class UserController {
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
-      // Usuario no existe, pero NO es un error (200 OK)
-      res.status(200).json({
+      // Usuario no existe
+      const response: ApiResponse<UserExistsData> = {
         success: true,
-        exists: false,
+        data: { exists: false },
         message: 'User not found',
-      });
+      };
+      res.status(200).json(response);
       return;
     }
 
-    res.status(200).json({
+    const response: ApiResponse<UserExistsData> = {
       success: true,
-      exists: true,
-      data: user
-    });
+      data: {
+        exists: true,
+        user,
+      },
+    };
+    res.status(200).json(response);
   });
 
   /** POST /api/users
@@ -77,12 +87,14 @@ export class UserController {
       // Generar JWT token para el nuevo usuario
       const token = this.jwtService.generateToken(user.id, user.email);
 
-      res.status(201).json({
+      const userWithToken: UserWithToken = { ...user, token };
+
+      const response: ApiResponse<UserWithToken> = {
         success: true,
         message: 'User created successfully',
-        data: user,
-        token,
-      });
+        data: userWithToken,
+      };
+      res.status(201).json(response);
     } catch (error) {
       if (error instanceof Error && error.message === 'User already exists') {
         throw new AppError(409, 'User already exists');
@@ -99,11 +111,11 @@ export class UserController {
 
     const exists = await this.userService.exists(email);
 
-    res.status(200).json({
+    const response: ApiResponse<{ exists: boolean }> = {
       success: true,
-      exists,
-      ...(exists && { message: 'User exists' }),
-      ...(!exists && { message: 'User not found' }),
-    });
+      data: { exists },
+      message: exists ? 'User exists' : 'User not found',
+    };
+    res.status(200).json(response);
   });
 }
