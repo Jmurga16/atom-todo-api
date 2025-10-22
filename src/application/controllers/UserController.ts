@@ -1,45 +1,72 @@
 import { Request, Response } from 'express';
 import { UserService } from '../../domain/use-cases/UserService';
+import { JwtService } from '../../domain/use-cases/JwtService';
 import { asyncHandler, AppError } from '../middlewares/error.middleware';
 
-/**
- * Controlador de usuarios
- * Maneja las peticiones HTTP relacionadas con usuarios
- * Siguiendo el patrón MVC
- */
-export class UserController {
-  constructor(private readonly userService: UserService) {}
 
-  /**
-   * GET /api/users/:email
-   * Busca un usuario por email
-   * Implementa el requisito: "Busca el usuario si ha sido creado"
+export class UserController {
+  private readonly jwtService: JwtService;
+
+  constructor(private readonly userService: UserService) {
+    this.jwtService = new JwtService();
+  }
+
+  /** POST /api/users/login
+   * Busca un usuario por email y retorna sus datos con JWT token si existe
+   * Si no existe, retorna exists: false sin error 404 (mejor seguridad)
    */
-  getUserByEmail = asyncHandler(async (req: Request, res: Response): Promise<void> => {
-    const { email } = req.params;
+  login = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
 
     const user = await this.userService.findByEmail(email);
 
     if (!user) {
-      res.status(404).json({
-        success: false,
+      // Usuario no existe, pero NO es un error (200 OK)
+      res.status(200).json({
+        success: true,
+        exists: false,
         message: 'User not found',
-        userExists: false,
+      });
+      return;
+    }
+
+    // Generar JWT token
+    const token = this.jwtService.generateToken(user.id, user.email);
+
+    res.status(200).json({
+      success: true,
+      exists: true,
+      token,
+    });
+  });
+
+  /** POST /api/users/login
+   * Busca un usuario por email
+  */
+  getUserByEmail = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const { email } = req.body;
+
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      // Usuario no existe, pero NO es un error (200 OK)
+      res.status(200).json({
+        success: true,
+        exists: false,
+        message: 'User not found',
       });
       return;
     }
 
     res.status(200).json({
       success: true,
-      data: user,
-      userExists: true,
+      exists: true,
+      data: user
     });
   });
 
-  /**
-   * POST /api/users
-   * Crea un nuevo usuario
-   * Implementa el requisito: "Agrega un nuevo usuario"
+  /** POST /api/users
+   * Crea un nuevo usuario y retorna JWT token
    */
   createUser = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { email } = req.body;
@@ -47,10 +74,14 @@ export class UserController {
     try {
       const user = await this.userService.createUser({ email });
 
+      // Generar JWT token para el nuevo usuario
+      const token = this.jwtService.generateToken(user.id, user.email);
+
       res.status(201).json({
         success: true,
         message: 'User created successfully',
         data: user,
+        token,
       });
     } catch (error) {
       if (error instanceof Error && error.message === 'User already exists') {
@@ -60,10 +91,8 @@ export class UserController {
     }
   });
 
-  /**
-   * POST /api/users/check
+  /** POST /api/users/check
    * Verifica si un usuario existe por email
-   * Endpoint auxiliar para el flujo de login
    */
   checkUserExists = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const { email } = req.body;

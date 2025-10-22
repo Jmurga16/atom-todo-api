@@ -2,10 +2,7 @@ import { IUserRepository } from '../../domain/repositories/IUserRepository';
 import { User, CreateUserDTO, UserFactory } from '../../domain/entities/User';
 import { db } from '../../config/firebase.config';
 
-/**
- * Implementación concreta del repositorio de usuarios usando Firestore
- * Siguiendo el patrón Repository (DDD)
- */
+
 export class UserRepository implements IUserRepository {
   private readonly collection = 'users';
 
@@ -90,9 +87,6 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  /**
-   * Mapea un documento de Firestore a una entidad User
-   */
   private mapDocumentToUser(doc: FirebaseFirestore.DocumentSnapshot): User {
     const data = doc.data();
 
@@ -103,8 +97,7 @@ export class UserRepository implements IUserRepository {
     return {
       id: doc.id,
       email: data.email,
-      createdAt: data.createdAt?.toDate() || new Date(),
-      updatedAt: data.updatedAt?.toDate() || new Date(),
+      createdAt: data.createdAt?.toDate() || new Date()
     };
   }
 }

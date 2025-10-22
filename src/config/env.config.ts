@@ -21,7 +21,12 @@ export const config = {
   cors: {
     allowedOrigins: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:4200'],
   },
-} as const;
+
+  jwt: {
+    secret: process.env.JWT_SECRET || 'default-secret-key-change-in-production',
+    expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as string,
+  },
+};
 
 /**
  * Valida que las variables de entorno requeridas estén configuradas
