@@ -1,39 +1,46 @@
-/**
- * Task Entity - Representa una tarea en el dominio
- * Siguiendo principios de DDD (Domain-Driven Design)
- */
 export interface Task {
   id: string;
   userId: string;
   title: string;
   description: string;
   completed: boolean;
+  active: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
 
-/**
- * DTO para crear una nueva tarea
- */
 export interface CreateTaskDTO {
   userId: string;
   title: string;
   description: string;
 }
 
-/**
- * DTO para actualizar una tarea
- */
 export interface UpdateTaskDTO {
   title?: string;
   description?: string;
   completed?: boolean;
 }
 
-/**
- * Factory pattern para crear tareas
- * Aplica el principio de responsabilidad única (SOLID)
- */
+export interface TaskQueryParams {
+  userId: string;
+  page?: number;
+  limit?: number;
+  sortBy?: 'createdAt' | 'updatedAt' | 'title';
+  sortOrder?: 'asc' | 'desc';
+  completed?: boolean;
+  title?: string;
+  startDate?: Date;
+  endDate?: Date;
+}
+
+export interface PaginatedTaskResponse {
+  tasks: Task[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export class TaskFactory {
   static create(dto: CreateTaskDTO): Omit<Task, 'id'> {
     const now = new Date();
@@ -43,6 +50,7 @@ export class TaskFactory {
       title: dto.title.trim(),
       description: dto.description.trim(),
       completed: false,
+      active: true,
       createdAt: now,
       updatedAt: now,
     };

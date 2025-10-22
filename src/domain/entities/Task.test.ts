@@ -15,6 +15,7 @@ describe('TaskFactory', () => {
       expect(task.title).toBe('My Task');
       expect(task.description).toBe('Description');
       expect(task.completed).toBe(false);
+      expect(task.active).toBe(true);
       expect(task.createdAt).toBeInstanceOf(Date);
       expect(task.updatedAt).toBeInstanceOf(Date);
     });
@@ -29,6 +30,7 @@ describe('TaskFactory', () => {
       const task = TaskFactory.create(dto);
 
       expect(task.completed).toBe(false);
+      expect(task.active).toBe(true);
     });
   });
 
@@ -39,6 +41,7 @@ describe('TaskFactory', () => {
       title: 'Original Title',
       description: 'Original Description',
       completed: false,
+      active: true,
       createdAt: new Date('2024-01-01'),
       updatedAt: new Date('2024-01-01'),
     };

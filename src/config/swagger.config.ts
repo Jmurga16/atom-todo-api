@@ -60,6 +60,14 @@ Desarrollado con:
     },
   ],
   components: {
+    securitySchemes: {
+      BearerAuth: {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        description: 'Enter JWT token obtained from /api/users/login endpoint',
+      },
+    },
     schemas: {
       User: {
         type: 'object',
@@ -119,6 +127,11 @@ Desarrollado con:
             type: 'boolean',
             description: 'Task completion status',
             example: false,
+          },
+          active: {
+            type: 'boolean',
+            description: 'Task active status (false = soft deleted)',
+            example: true,
           },
           createdAt: {
             type: 'string',

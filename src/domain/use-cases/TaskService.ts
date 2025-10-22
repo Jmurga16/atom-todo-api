@@ -1,5 +1,5 @@
 import { ITaskRepository } from '../repositories/ITaskRepository';
-import { Task, CreateTaskDTO, UpdateTaskDTO } from '../entities/Task';
+import { Task, CreateTaskDTO, UpdateTaskDTO, TaskQueryParams, PaginatedTaskResponse } from '../entities/Task';
 
 /**
  * Servicio de tareas - Casos de uso
@@ -10,7 +10,7 @@ export class TaskService {
   constructor(private readonly taskRepository: ITaskRepository) {}
 
   /**
-   * Obtiene todas las tareas de un usuario ordenadas por fecha de creación
+   * Obtiene todas las tareas activas de un usuario ordenadas por fecha de creación
    * Implementa el requisito: "todas las tareas pendientes del usuario ordenadas por fecha de creación"
    */
   async getTasksByUserId(userId: string): Promise<Task[]> {
@@ -19,6 +19,19 @@ export class TaskService {
     } catch (error) {
       console.error('Error getting tasks by user id:', error);
       throw new Error('Failed to get tasks');
+    }
+  }
+
+  /**
+   * Obtiene tareas con paginación, ordenamiento y filtros
+   * Implementa el requisito: "Obtener tareas (paginado y ordenamiento con filtros)"
+   */
+  async getTasksWithQuery(params: TaskQueryParams): Promise<PaginatedTaskResponse> {
+    try {
+      return await this.taskRepository.findWithQuery(params);
+    } catch (error) {
+      console.error('Error getting tasks with query:', error);
+      throw new Error('Failed to get tasks with query');
     }
   }
 

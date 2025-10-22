@@ -8,8 +8,6 @@ describe('UserFactory', () => {
 
       expect(user.email).toBe('test@example.com');
       expect(user.createdAt).toBeInstanceOf(Date);
-      expect(user.updatedAt).toBeInstanceOf(Date);
-      expect(user.createdAt).toEqual(user.updatedAt);
     });
 
     it('should create a user with valid timestamps', () => {

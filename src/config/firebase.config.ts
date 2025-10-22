@@ -19,7 +19,7 @@ class FirebaseConfig {
       if (isCloudRun) {
         // En producción (Cloud Functions/Cloud Run), las credenciales se cargan automáticamente
         this.app = admin.initializeApp();
-        console.log('🔥 Firebase initialized with automatic credentials (Cloud Run/Functions)');
+        console.log('Firebase initialized with automatic credentials (Cloud Run/Functions)');
       } else {
         // En desarrollo, usar credenciales del archivo .env
         this.app = admin.initializeApp({
@@ -29,7 +29,7 @@ class FirebaseConfig {
             clientEmail: config.firebase.clientEmail,
           }),
         });
-        console.log('🔥 Firebase initialized with .env credentials (Development)');
+        console.log('Firebase initialized with .env credentials (Development)');
       }
 
       this.db = this.app.firestore();

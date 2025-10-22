@@ -1,18 +1,7 @@
 import { body, param } from 'express-validator';
 
-/**
- * Validadores para las rutas de tareas
- * Siguiendo el principio DRY (Don't Repeat Yourself)
- */
 
 export const createTaskValidator = [
-  body('userId')
-    .notEmpty()
-    .withMessage('User ID is required')
-    .isString()
-    .withMessage('User ID must be a string')
-    .trim(),
-
   body('title')
     .notEmpty()
     .withMessage('Title is required')
@@ -58,15 +47,6 @@ export const updateTaskValidator = [
     .optional()
     .isBoolean()
     .withMessage('Completed must be a boolean'),
-];
-
-export const getTasksByUserValidator = [
-  param('userId')
-    .notEmpty()
-    .withMessage('User ID is required')
-    .isString()
-    .withMessage('User ID must be a string')
-    .trim(),
 ];
 
 export const taskIdValidator = [
